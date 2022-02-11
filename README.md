@@ -1,2 +1,2 @@
 # GradientDescent
-GradientDescent Algorithm
+Gradient Descent Algorithm
