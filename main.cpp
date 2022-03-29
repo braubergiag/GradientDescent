@@ -123,12 +123,10 @@ void TestF3(){
 
 int main(int argc, char *argv[])
 {
-//    QApplication a(argc, argv);
-//    MainWindow w;
-//    w.show();
+
+        // some changes
       TestF1();
       TestF2();
       TestF3();
       return 0;
-//    return a.exec();
 }
