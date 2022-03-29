@@ -81,7 +81,7 @@ void TestF2(){
         gd.setStoppingCriterion(StoppingCriterion::byGradientMagnitude);
         gd.Optimize(functionLocation,functionValue);
 
-        PrintResult(functionLocation,functionValue,startPoint,"F2");
+        PrintResult(functionLocation,functionValue,startPoint,"F2 ");
     }
     {
        startPoint =  {8.0};
@@ -89,7 +89,7 @@ void TestF2(){
         gd.setStoppingCriterion(StoppingCriterion::byGradientMagnitude);
        gd.Optimize(functionLocation,functionValue);
 
-       PrintResult(functionLocation,functionValue,startPoint,"F2");
+       PrintResult(functionLocation,functionValue,startPoint,"F2 ");
 
 
     }
