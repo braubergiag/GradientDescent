@@ -1,11 +1,19 @@
 
 #include "gradientdescent.h"
+#include "model.h"
+#include "functionhandler.h"
 #include <iostream>
 #include <functional>
 #include <sstream>
 #include <cmath>
 
+enum class Command {
+    CHOOSE_FUNCTION = 1,
+    CHOOSE_ALGORITHM = 2,
+    CHOOSE_STOPPING_CRITERIA = 3,
+};
 
+int FunctionHandler::functionCounter_ = 0;
 void PrintResult(const  Point &functionLocation, double functionValue,
                  Point startPoint,const std::string & funcName = {}){
     std::cout << "Function: " + funcName << std::endl;
@@ -122,13 +130,103 @@ void TestF3(){
 }
 
 
+int ChooseStoppingCriteria(Model * model){
+    std::cout << "Выберите критерий остановки:"
+                 "\n 1. По значению градиента "
+                 "\n 2. По значению разности между точками"
+                 "\n 3. По значению разности функции";
+    std::cout << "Ваш выбор: ";
+    std::string choice;
+    std::cin >> choice;
+    int stoppingCriteriaChoice = std::stoi(choice);
+    switch (stoppingCriteriaChoice) {
+        case 1:
+            model->setStoppingCriterion(StoppingCriterion::byGradientMagnitude);
+            break;
+        case 2:
+            model->setStoppingCriterion(StoppingCriterion::byDeltaChangeMagnitude);
+            break;
+        case 3:
+            model->setStoppingCriterion(StoppingCriterion::byValueChangeMagnitude);
+            break;
+        default:
+            std::cout << "Критерий остановки не выбран.\n";
+            break;
+    }
+    return  0;
+}
 
+int ChooseAlgorithm(Model * model){
+    std::cout << "Выберите алгоритм оптимизации:\n 1. Градиентный спуск \n 2. Случайный поиск \n";
+    std::cout << "Ваш выбор: ";
+    std::string algorithmNumberChoice;
+    std::cin >> algorithmNumberChoice;
+    int algorithmNumberChoiceInt  = std::stoi(algorithmNumberChoice);
+    switch (algorithmNumberChoiceInt) {
+        case 1:
+            model->setAlgorimth(Algorithm::gradientDescent);
+            break;
+        case 2:
+            model->setAlgorimth(Algorithm::randomSearch);
+            break;
+        default:
+            std::cout << "Алгоритм не выбран.\n";
+            break;
+    }
+    return  0;
+}
+
+int ChooseFunction(Model * model) {
+
+    std::string command_line;
+    std::cout << "Выберите функцию для оптимизации:\n";
+    int counter = 0;
+    for (auto & f : model->functionsLibrary()){
+        std::cout << (counter + 1) << ". " << f.first << "\n";
+        ++counter;
+    }
+    std::cout << "Введите целое число от 1 до " << model->functionsLibrary().size() << ": ";
+    std::string funcNumberChoice;
+    std::cin >> funcNumberChoice;
+    int funcNumber  = std::stoi(funcNumberChoice);
+    FunctionHandler fh;
+    for (auto & [key,value] : model->functionsLibrary()){
+        if (value.getFunctionNumber() == funcNumber) {
+            std::cout << "Вы выбрали: " << key;
+            fh = model->functionsLibrary().at(key);
+
+        }
+    }
+}
 int main(int argc, char *argv[])
 {
 
-      TestF1();
-      TestF2();
-      TestF3();
+    Model * model = new Model();
+
+
+
+    ChooseStoppingCriteria(model);
+    ChooseAlgorithm(model);
+
+
+
+    while (getline(std::cin,command_line)) {
+        std::stringstream ss(command_line);
+        std::string command;
+        ss >> command;
+        int commandNumber = std::stoi(command);
+        switch (commandNumber) {
+            case 1:
+                ChooseFunction(model);
+                break;
+            case 2:
+
+        }
+
+
+    }
+
+    delete model;
       return 0;
 
 }

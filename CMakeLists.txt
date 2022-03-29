@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.19)
 project(GradientDescent)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 add_executable(GradientDescent
         ${CMAKE_SOURCE_DIR}/src/main.cpp
         ${CMAKE_SOURCE_DIR}/src/gradientdescent.cpp

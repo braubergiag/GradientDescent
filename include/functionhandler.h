@@ -5,9 +5,13 @@
 #include <vector>
 #include <functional>
 #include <map>
+#include <iostream>
 using Function = std::function<double(const std::vector<double> &)>;
 using Domain = std::pair<double,double>;
 using Point = std::vector<double>;
+
+
+
 
 class FunctionHandler
 {
@@ -23,6 +27,8 @@ public:
     int getDim() const;
     std::vector<Domain> getFunctionDomain() const;
     Point getStartPoint() const;
+    int getFunctionNumber() const;
+
 
     void setObjectFunction(const Function &newObjectFunction);
     void setGradFunction(const std::vector<Function> &newGradFunction);
@@ -41,11 +47,13 @@ private:
     std::vector<Function> gradFunction_;
     int dim_ = 0;
     std::string functionStrView_;
-
-
+    int functionNumber_;
+    static int functionCounter_;
 
 
 };
+
+
 
 using FunctionsLibrary = std::map<std::string, FunctionHandler>;
 

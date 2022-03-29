@@ -7,8 +7,15 @@ FunctionHandler::FunctionHandler()
 
 FunctionHandler::FunctionHandler( Function objectFunction,
                                   std::vector<Function> gradFunction,int dim, std::string  functionStrView):
-    objectFunction_(objectFunction),gradFunction_(gradFunction),dim_(dim),functionStrView_(functionStrView){}
+    objectFunction_(objectFunction),gradFunction_(gradFunction),dim_(dim),functionStrView_(functionStrView),
+    functionNumber_(++functionCounter_){
 
+    std::cout << "Create fh #" << functionNumber_ << std::endl;
+}
+
+int FunctionHandler::getFunctionNumber() const {
+    return functionNumber_;
+}
 
 
 std::string FunctionHandler::getFunctionStrView() const
