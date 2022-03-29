@@ -1,8 +1,6 @@
 #include "gradientdescent.h"
 
 
-
-
 GradientDescent::GradientDescent() {
 
     nDims_ = 0;

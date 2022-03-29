@@ -1,0 +1,1 @@
+/usr/bin/g++ -g CMakeFiles/GradientDescent.dir/src/main.cpp.o CMakeFiles/GradientDescent.dir/src/gradientdescent.cpp.o CMakeFiles/GradientDescent.dir/src/functionhandler.cpp.o CMakeFiles/GradientDescent.dir/src/model.cpp.o -o GradientDescent 
