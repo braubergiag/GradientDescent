@@ -1,3 +1,0 @@
-/home/marshall/Programming/GDConsole/GradientDescent/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/marshall/Programming/GDConsole/GradientDescent/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/marshall/Programming/GDConsole/GradientDescent/cmake-build-debug/CMakeFiles/GradientDescent.dir
