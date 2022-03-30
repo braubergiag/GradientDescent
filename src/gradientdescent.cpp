@@ -67,62 +67,65 @@ bool GradientDescent::randomSearch(std::vector<double> &funcLoc,
                                    double &funcVal,FunctionHandler & fh)
 {
 
-    double xMin,xMax,yMin,yMax;
      std::vector<Domain> domain =  functionHandler_.getFunctionDomain();
-    xMin = domain.at(0).first;
-    xMax = domain.at(0).second;
 
-    yMin = domain.at(1).first;
-    yMax=  domain.at(1).second;
+    std::vector<double> ranges = {},middlePoint = {};
 
-
-
-    double range_x = xMax - xMin;
-    double range_y = yMax - yMin;
-    double mx = xMin < 0 ? (range_x / 2) - (range_x / 2) : (range_x / 2);
-    double my = yMin < 0 ? (range_y / 2) - (range_y / 2) : (range_y / 2);
-
-    double len = range_x < range_y ? range_x / 2 : range_y / 2;
-    double lx,ly,rx,ry,x,y;
-
+    double coordinateRange = 0, minRange = 10e6, singleMiddlePoint = 0;
+    for (auto i = 0; i < nDims_; ++i) {
+        coordinateRange = domain.at(i).second - domain.at(i).first;
+        if (coordinateRange < minRange) {
+            minRange = coordinateRange;
+        }
+        ranges.push_back(coordinateRange);
+    }
+    for (auto i = 0; i < nDims_; ++i) {
+        singleMiddlePoint =  domain.at(i).first < 0 ? (ranges.at(i) / 2) - (ranges.at(i) / 2) : (ranges.at(i) / 2);
+        middlePoint.push_back(singleMiddlePoint);
+    }
+    
+    double currentBoardLen = minRange / 2;
 
     clearState();
     prepareState();
     int iterCount = 0;
     unsigned m_seed  = std::chrono::system_clock::now().time_since_epoch().count();
     std::mt19937 generator;
-    std::uniform_real_distribution<double> uniform_x,uniform_y;
+    std::uniform_real_distribution<double> uniform;
     generator.seed(m_seed);
     PrintIterationLog(iterCount);
+    std::vector<std::pair<double,double>> borders;
+    while (iterCount < maxIter_ && currentBoardLen > eps_) {
+        for (auto i = 0; i < nDims_; ++i) {
+            borders.push_back(std::make_pair(middlePoint.at(i) - currentBoardLen, middlePoint.at(i) + currentBoardLen));
 
-    while (iterCount < maxIter_ && len > eps_) {
-        lx = mx - len;
-        rx = mx + len;
-        ly = my - len;
-        ry = my + len;
-        for (auto i = 0; i < numberOfTrials_; ++ i) {
-            uniform_x = std::uniform_real_distribution<double> (lx,rx);
-            uniform_y = std::uniform_real_distribution<double> (ly,ry);
-            x = uniform_x(generator);
-            y = uniform_y(generator);
+        }
+        Point point = {};
+        for (auto trialCounter = 0; trialCounter < numberOfTrials_; ++ trialCounter) {
+            point.clear();
+            for (auto i = 0; i < nDims_; ++i) {
+                uniform = std::uniform_real_distribution<double> (borders.at(i).first,borders.at(i).second);
+                point.push_back(uniform(generator));
+            }
+            if (objectFunc_(point) < objectFunc_(middlePoint)) {
 
-            if (objectFunc_({x,y}) < objectFunc_({mx,my})) {
-                mx = x;
-                my = y;
-                historyByCoord_[0].push_back(x);
-                historyByCoord_[1].push_back(y);
-                history_.push_back({x,y});
-                currentPoint_ = {mx,my};
+                middlePoint = point;
+                for (auto i = 0; i < nDims_; ++i) {
+                    historyByCoord_.at(i).push_back(middlePoint.at(i));
+                }
 
-                functionValuesHistory_.push_back(objectFunc_({x,y}));
+                history_.push_back(middlePoint);
+                currentPoint_ = middlePoint;
+
+                functionValuesHistory_.push_back(objectFunc_(currentPoint_));
 
             }
         }
         PrintIterationLog(iterCount + 1);
         iterCount++;
-        len *= 0.9;
+        currentBoardLen *= 0.9;
     }
-    funcLoc = {mx,my};
+    funcLoc = middlePoint;
     funcVal = objectFunc_(funcLoc);
     return 0;
 

@@ -5,7 +5,7 @@ Model::Model()
     startPoint_ = {};
     iterCount_ = 1000;
     magnitude_ = 1e-9;
-    magnitudeThreshHold_ = 1e-9;
+    magnitudeThreshHold_ = 1e-4;
     alpha_ = 0.001;
     numberOfTrials_ = 500;
     algorithm_ = Algorithm::GRADIENT_DESCENT;
