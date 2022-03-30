@@ -3,7 +3,7 @@
 #define GRADIENTDESCENT_CONSOLEWRAPPER_H
 
 #include "model.h"
-
+#include <iomanip>
 enum class RequestType {
     STOP = 0,
     SET_FUNCTION = 1,
@@ -14,8 +14,9 @@ enum class RequestType {
     SET_START_POINT = 6,
     SET_ITERATION_COUNT = 7,
     SET_STEP_SIZE = 8,
-    RUN_MODEL = 9,
-    REQUEST_COUNT = 10,
+    SET_NUMBER_OF_TRIALS = 9,
+    RUN_MODEL = 10,
+    REQUEST_COUNT = 11,
 };
 
 class ConsoleWrapper {
@@ -40,19 +41,26 @@ private:
     bool CheckRequestType(int commandNumber) const;
     bool CheckStoppingCriterionType(int commandNumber) const;
     bool CheckAlgorithmType(int commandNumber) const;
+    bool CheckBoundsForPoint(const Point &point) const;
 
     std::string GenerateHelp() const;
+    std::string GetStartPointView() const;
+    std::string GetDomainView() const;
+
+    void LoadDefaultState() ;
+
 
     double InputDoubleNumber(const std::string &hint = {}, const std::string &errorHint = {}) const;
     int InputIntNumber(const std::string &hint = {}, const std::string &errorHint = {}) const;
-    bool isFunctionDomainInit {false};
-    bool isStoppingCriteriaInit {false};
+    bool isFunctionDomainInit {true};
+    bool isStoppingCriteriaInit {true};
     bool isFunctionInit {false};
-    bool isAlgorithmInit{false};
-    bool isStartPointInit{false};
-    bool isIterationCountInit{false};
-    bool isStepSizeInit{false};
-    bool isMagnitudeInit{false};
+    bool isAlgorithmInit{true};
+    bool isStartPointInit{true};
+    bool isIterationCountInit{true};
+    bool isStepSizeInit{true};
+    bool isMagnitudeInit{true};
+    bool isNumberOfTrialsInit{true};
     Model * model_;
 };
 

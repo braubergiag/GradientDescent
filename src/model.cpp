@@ -2,12 +2,15 @@
 
 Model::Model()
 {
-    startPoint_ = {0,0};
+    startPoint_ = {};
     iterCount_ = 1000;
     magnitude_ = 1e-9;
     magnitudeThreshHold_ = 1e-9;
     alpha_ = 0.001;
     numberOfTrials_ = 500;
+    algorithm_ = Algorithm::GRADIENT_DESCENT;
+    stoppingCriterion_ = StoppingCriterion::BY_GRADIENT_MAGNITUDE;
+
     setFunctionsLibrary();
 }
 Point Model::functionLocation() const
@@ -71,6 +74,7 @@ void Model::setFunctionHandler( FunctionHandler  newFunctionHandler)
 {
 
     functionHandler_ = newFunctionHandler;
+    startPoint_ = functionHandler_.getStartPoint();
 }
 
 
@@ -315,6 +319,7 @@ const FunctionsLibrary &Model::functionsLibrary() const
 void Model::setStartPoint(Point newStartPoint)
 {
     startPoint_ = newStartPoint;
+    functionHandler_.setStartPoint(startPoint_);
 }
 FunctionHandler& Model::functionHandler()
 {

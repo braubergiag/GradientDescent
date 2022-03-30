@@ -256,20 +256,14 @@ void GradientDescent::prepareState()
 
 bool GradientDescent::inDomain()
 {
-    double xMin,xMax,yMin,yMax;
-     std::vector<Domain> domain =  functionHandler_.getFunctionDomain();
-    xMin = domain.at(0).first;
-    xMax = domain.at(0).second;
-
-    yMin = domain.at(1).first;
-    yMax=  domain.at(1).second;
-
-
-    double x = currentPoint_.at(0);
-    double y = currentPoint_.at(1);
-    if (abs(x) >= abs(xMin) || abs(x) >= abs(xMax) || abs(y) >= abs(yMin) || abs(y) >= abs(yMax)) {
-        return false;
+    std::vector<Domain> domain =  functionHandler_.getFunctionDomain();
+    for (auto i = 0; i < domain.size(); ++i) {
+        if ( abs(currentPoint_.at(i)) > abs(domain.at(i).first) || abs(currentPoint_.at(i)) > abs(domain.at(i).second)) {
+            return false;
+        }
     }
+
+
     return true;
 }
 

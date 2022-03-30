@@ -13,6 +13,7 @@ int ConsoleWrapper::SetFunction() {
         if (funcHandler.getFunctionNumber() == commandNumber) {
             std::cout << "You chosen: " << funcName;
             model_->setFunctionHandler(funcHandler);
+
         }
     }
     std::cout << std::endl;
@@ -21,15 +22,18 @@ int ConsoleWrapper::SetFunction() {
 }
 std::string ConsoleWrapper::GenerateHelp() const {
     std::stringstream ss;
+//    const int precision = 15;
+//    ss.precision(precision);
     ss << "1. Set Function " << (isFunctionInit ? "(OK) [" + model_->functionHandler().getFunctionStrView() + "]\n" : "\n")
        << "2. Set Algorithm " << (isAlgorithmInit ? "(OK) ["  + model_->algorithmStrView() + "]\n" : "\n")
        << "3. Set Stopping criterion " << (isStoppingCriteriaInit ? "(OK) ["  + model_->stoppingCriterionStrView() + "]\n" : "\n")
-       << "4. Set Function domain " << (isFunctionDomainInit ? "(OK) \n"  : "\n")
-       << "5. Set Magnitude " << (isMagnitudeInit ? "(OK) ["  +  std::to_string(model_->magnitude())+ "]\n" : "\n")
-       << "6. Set Start Point " << (isStartPointInit ? "(OK) \n" : "\n")
+       << "4. Set Function domain " << (isFunctionDomainInit ? "(OK) " + GetDomainView() + "\n"  : "\n")
+       << "5. Set Magnitude "  <<  (isMagnitudeInit ? "(OK) \n" : "\n")
+       << "6. Set Start Point " << (isStartPointInit ? "(OK) " + GetStartPointView() + "\n" : "\n")
        << "7. Set Iteration count " << (isIterationCountInit ? "(OK) ["  +  std::to_string(model_->iterCount())+  "]\n" : "\n")
        << "8. Set Step size " <<  (isStepSizeInit ? "(OK) [" + std::to_string(model_->alpha()) + "]\n" : "\n")
-       << "9. Run model  \n"
+       << "9. Set number of trials (in random search) " << (isNumberOfTrialsInit ? "(OK) [" + std::to_string(model_->numberOfTrials()) + "]\n" : "\n")
+       << "10. Run model  \n"
        << "0. Quit \n";
     return ss.str();
 }
@@ -45,8 +49,9 @@ void ConsoleWrapper::Run() {
 //    SET_START_POINT = 6,
 //    SET_ITERATION_COUNT = 7,
 //    SET_STEP_SIZE = 8,
-//    RUN_MODEL = 9,
-//    REQUEST_COUNT = 10,
+//    SET_NUMBER_OF_TRIALS = 9,
+//    RUN_MODEL = 10,
+//    REQUEST_COUNT = 11,
     bool running = true;
 
     std::string command;
@@ -88,6 +93,9 @@ void ConsoleWrapper::Run() {
             case RequestType::SET_STEP_SIZE:
                 SetStepSize();
                 break;
+            case RequestType::SET_NUMBER_OF_TRIALS:
+                SetNumberOfTrials();
+                break;
             case RequestType::RUN_MODEL:
                  RunModel();
                  break;
@@ -102,6 +110,33 @@ void ConsoleWrapper::Run() {
     }
 }
 void ConsoleWrapper::RunModel() {
+//    std::vector<bool> initStatesGD = {isFunctionInit,isFunctionDomainInit,isStoppingCriteriaInit,isMagnitudeInit,
+//                                    isAlgorithmInit,isStartPointInit,isIterationCountInit};
+//    std::vector<bool> initStatesRS= {isFunctionInit,isFunctionDomainInit,
+//                                      isAlgorithmInit,isIterationCountInit};
+//    if (isAlgorithmInit) {
+//        switch (model_->algorimth()) {
+//            case  Algorithm::GRADIENT_DESCENT:
+//                for (const auto& state: initStatesGD) {
+//                    if (!state) {
+//                        std::cout << "Config for " << model_->algorithmStrView() << "algorithm is not complete. \n";
+//                        Run();
+//                    }
+//                }
+//                break;
+//            case Algorithm::RANDOM_SEARCH:
+//                for (const auto& state: initStatesRS) {
+//                    if (!state) {
+//                        std::cout << "Config for" << model_->algorithmStrView() << "algorithm is not complete.  \n";
+//                        Run();
+//                    }
+//                }
+//        }
+//
+//    } else {
+//        Run();
+//    }
+
     model_->run();
 
 }
@@ -129,7 +164,7 @@ bool ConsoleWrapper::CheckAlgorithmType(int commandNumber) const {
 
 int ConsoleWrapper::SetStoppingCriteria() {
     std::string hint {};
-    std::string errorHint = "Enter a whole number:\n";
+    std::string errorHint = "Enter a whole number: ";
     std::stringstream ss;
     ss << "Choose stopping criteria:" <<
                  "\n 1. By Gradient Magnitude " <<
@@ -164,7 +199,7 @@ int ConsoleWrapper::SetStoppingCriteria() {
 }
 
 int ConsoleWrapper::SetAlgorithm() {
-    std::cout << "Choose algorithm_:\n 1. Gradient Descent \n 2. Random Search \n";
+    std::cout << "Choose algorithm:\n 1. Gradient Descent \n 2. Random Search \n";
     int commandNumber = InputIntNumber({});
     Algorithm algorithm;
     if (CheckAlgorithmType(commandNumber)) {
@@ -180,6 +215,8 @@ int ConsoleWrapper::SetAlgorithm() {
             break;
         case Algorithm::RANDOM_SEARCH:
             model_->setAlgorimth(Algorithm::RANDOM_SEARCH);
+            SetNumberOfTrials();
+
             break;
         default:
             break;
@@ -194,17 +231,18 @@ int ConsoleWrapper::SetAlgorithm() {
 int ConsoleWrapper::SetStartPoint() {
     if (!isFunctionInit) { SetFunction();};
     if (!isFunctionDomainInit) { SetFunctionDomain();};
-    std::cout << "Enter start point coordinates separated by spaces: ";
-    double coordinate = 0;
+    std::string input;
     Point startPoint = {};
-    std::string line;
-    std::cin.clear();
-    getline(std::cin, line);
-    std::istringstream iss(line);
-    while (iss >> coordinate && startPoint.size() < model_->functionHandler().getDim())
-    {
+    double coordinate;
+    for (auto i = 0; i < model_->functionHandler().getDim(); ++i) {
+        coordinate = InputDoubleNumber("Coordinate " + std::to_string(i+1) + ": ", "Enter the number: ");
         startPoint.push_back(coordinate);
     }
+    if (!CheckBoundsForPoint(startPoint)) {
+        std::cout << "Your point not within function domain. Try Again. \n";
+        SetStartPoint();
+    }
+    model_->setStartPoint(startPoint);
     isStartPointInit = true;
 
     return 0;
@@ -220,27 +258,43 @@ int ConsoleWrapper::SetMagnitude() {
 }
 
 int ConsoleWrapper::SetFunctionDomain() {
-    
+
+    std::vector<std::string> hint = {"min","max"};
+    std::vector<Domain> functionDomain= {};
+    const int domainSize = 2;
+    std::vector<double> domain = {};
+    double coordinate;
+
+    for (auto i = 0; i < model_->functionHandler().getDim(); ++i) {
+        for (auto j = 0; j < domainSize; ++j){
+            coordinate = InputDoubleNumber("Coordinate " + std::to_string(i+1) + " [" + hint.at(j) + "] : ", "Enter the number: ");
+            domain.push_back(coordinate);
+        }
+        functionDomain.push_back(std::make_pair(domain.at(0),domain.at(1)));
+        domain.clear();
+
+    }
+    model_->functionHandler().setFunctionDomain(functionDomain);
     isFunctionDomainInit = true;
     return 0;
 }
 
 int ConsoleWrapper::SetNumberOfTrials() {
-    int numberOfTrials = InputIntNumber("Enter number of trials:","Enter a whole number: ");
+    int numberOfTrials = InputIntNumber("Enter number of trials: ","Enter a whole number: ");
     model_->setNumberOfTrials(numberOfTrials);
-
+    isNumberOfTrialsInit = true;
     return 0;
 }
 
 int ConsoleWrapper::SetIterationCount() {
-    int iterCount= InputIntNumber("Enter max number of iterations:","Enter a whole number: ");
+    int iterCount= InputIntNumber("Enter max number of iterations: ","Enter a whole number: ");
     model_->setIterCount(iterCount);
     isIterationCountInit = true;
     return 0;
 }
 
 int ConsoleWrapper::SetStepSize() {
-    double alpha= InputDoubleNumber("Enter step size","Enter the number: ");
+    double alpha= InputDoubleNumber("Enter step size: ","Enter the number: ");
     model_->setAlpha(alpha);
     isStepSizeInit = true;
     return 0;
@@ -281,6 +335,48 @@ double ConsoleWrapper::InputDoubleNumber(const std::string &hint, const std::str
         }
     }
     return number;
+}
+
+std::string ConsoleWrapper::GetStartPointView() const {
+    std::string startPointView = {};
+    startPointView += "[ ";
+    for (const auto & coord : model_->startPoint()){
+        startPointView += std::to_string(coord);
+        startPointView += " ";
+    }
+    startPointView += "]";
+    return startPointView;
+}
+
+std::string ConsoleWrapper::GetDomainView() const {
+    std::string domainView = {};
+//    domainView += "[";
+    const auto & fh = model_->functionHandler();
+    for (auto i = 0; i < fh.getFunctionDomain().size(); ++i) {
+        double coordinatePoint = model_->startPoint().at(i);
+        domainView += "x" + std::to_string(i + 1) + " : " + std::to_string(coordinatePoint)
+        +    " [" + std::to_string(fh.getFunctionDomain().at(i).first) + ", "
+        +    std::to_string(fh.getFunctionDomain().at(i).second) + "]\t ";
+    }
+
+    return domainView;
+}
+
+bool ConsoleWrapper::CheckBoundsForPoint(const Point &point) const {
+
+    std::vector<Domain> domain =  model_->functionHandler().getFunctionDomain();
+    for (auto i = 0; i < domain.size(); ++i) {
+        if ( abs(point.at(i)) > abs(domain.at(i).first) || abs(point.at(i)) > abs(domain.at(i).second)) {
+            return false;
+        }
+    }
+
+
+    return true;
+}
+
+void ConsoleWrapper::LoadDefaultState() {
+
 }
 
 
