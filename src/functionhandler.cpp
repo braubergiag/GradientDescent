@@ -1,5 +1,8 @@
 #include "functionhandler.h"
 
+
+int FunctionHandler::functionCounter_ = 0;
+
 FunctionHandler::FunctionHandler()
 {
 
