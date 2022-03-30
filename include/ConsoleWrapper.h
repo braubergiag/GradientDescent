@@ -41,6 +41,7 @@ private:
     bool CheckStoppingCriterionType(int commandNumber) const;
     bool CheckAlgorithmType(int commandNumber) const;
 
+    std::string GenerateHelp() const;
 
     double InputDoubleNumber(const std::string &hint = {}, const std::string &errorHint = {}) const;
     int InputIntNumber(const std::string &hint = {}, const std::string &errorHint = {}) const;

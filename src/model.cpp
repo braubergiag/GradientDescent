@@ -2,6 +2,12 @@
 
 Model::Model()
 {
+    startPoint_ = {0,0};
+    iterCount_ = 1000;
+    magnitude_ = 1e-9;
+    magnitudeThreshHold_ = 1e-9;
+    alpha_ = 0.001;
+    numberOfTrials_ = 500;
     setFunctionsLibrary();
 }
 Point Model::functionLocation() const
@@ -35,9 +41,9 @@ std::string Model::stoppingCriterionStrView() const
 {
     switch (stoppingCriterion_) {
         case StoppingCriterion::BY_DELTA_CHANGE_MAGNITUDE:
-            return "Difference beetween points";
+            return "Difference between points";
         case StoppingCriterion::BY_VALUE_CHANGE_MAGNITUDE:
-            return "Difference beetween function values";
+            return "Difference between function values";
         case StoppingCriterion::BY_GRADIENT_MAGNITUDE:
             return "Gradient Magnitude";
         default:
@@ -49,9 +55,9 @@ std::string Model::stoppingCriterionStrView() const
 
 std::string Model::algorithmStrView() const
 {
-    switch (algorimth_) {
+    switch (algorithm_) {
         case Algorithm::GRADIENT_DESCENT:
-            return "Gradien Descent";
+            return "Gradient Descent";
         case Algorithm::RANDOM_SEARCH:
             return "Random Search";
         default:
@@ -91,9 +97,9 @@ void Model::run()
     gd_.Init(startPoint_,alpha_,
              iterCount_,magnitudeThreshHold_);
     gd_.setStoppingCriterion(this->stoppingCriterion_);
-    if (algorimth_ == Algorithm::GRADIENT_DESCENT) {
+    if (algorithm_ == Algorithm::GRADIENT_DESCENT) {
         gd_.Optimize(functionLocation_,functionValue_);
-    } else if (algorimth_ == Algorithm::RANDOM_SEARCH) {
+    } else if (algorithm_ == Algorithm::RANDOM_SEARCH) {
         gd_.setNumberOfTrials(numberOfTrials_);
         gd_.randomSearch(functionLocation_,functionValue_,functionHandler_);
     }
@@ -114,12 +120,12 @@ void Model::setNumberOfTrials(uint newNumberOfTrials)
 
 Algorithm Model::algorimth() const
 {
-    return algorimth_;
+    return algorithm_;
 }
 
 void Model::setAlgorimth(Algorithm newAlgorimth)
 {
-    algorimth_ = newAlgorimth;
+    algorithm_ = newAlgorimth;
 }
 
 Point Model::startPoint() const
@@ -243,10 +249,10 @@ std::string Model::generateLog()
     result += "Function value: " + std::to_string(functionValue_) + "\t|";
 
     result += "\n";
-    if (algorimth_ == Algorithm::GRADIENT_DESCENT) {
+    if (algorithm_ == Algorithm::GRADIENT_DESCENT) {
         result += "|Stopping Criteria: " + stoppingCriterionStrView() + "\t";
         result += "|Step size: " + std::to_string(alpha_) + "|\t";
-    } else if (algorimth_ == Algorithm::RANDOM_SEARCH){
+    } else if (algorithm_ == Algorithm::RANDOM_SEARCH){
         result += "|Method: " + algorithmStrView() + " Num of trials per frame: " + std::to_string(numberOfTrials_);
     }
 

@@ -19,6 +19,20 @@ int ConsoleWrapper::SetFunction() {
     isFunctionInit = true;
     return 0;
 }
+std::string ConsoleWrapper::GenerateHelp() const {
+    std::stringstream ss;
+    ss << "1. Set Function " << (isFunctionInit ? "(OK) [" + model_->functionHandler().getFunctionStrView() + "]\n" : "\n")
+       << "2. Set Algorithm " << (isAlgorithmInit ? "(OK) ["  + model_->algorithmStrView() + "]\n" : "\n")
+       << "3. Set Stopping criterion " << (isStoppingCriteriaInit ? "(OK) ["  + model_->stoppingCriterionStrView() + "]\n" : "\n")
+       << "4. Set Function domain " << (isFunctionDomainInit ? "(OK) \n"  : "\n")
+       << "5. Set Magnitude " << (isMagnitudeInit ? "(OK) ["  +  std::to_string(model_->magnitude())+ "]\n" : "\n")
+       << "6. Set Start Point " << (isStartPointInit ? "(OK) \n" : "\n")
+       << "7. Set Iteration count " << (isIterationCountInit ? "(OK) ["  +  std::to_string(model_->iterCount())+  "]\n" : "\n")
+       << "8. Set Step size " <<  (isStepSizeInit ? "(OK) [" + std::to_string(model_->alpha()) + "]\n" : "\n")
+       << "9. Run model  \n"
+       << "0. Quit \n";
+    return ss.str();
+}
 
 void ConsoleWrapper::Run() {
 
@@ -31,24 +45,14 @@ void ConsoleWrapper::Run() {
 //    SET_START_POINT = 6,
 //    SET_ITERATION_COUNT = 7,
 //    SET_STEP_SIZE = 8,
-//    REQUEST_COUNT = 9,
+//    RUN_MODEL = 9,
+//    REQUEST_COUNT = 10,
     bool running = true;
 
     std::string command;
     int commandNumber = 0;
     while (running){
-        std::stringstream ss;
-        ss << "1. Set Function " << (isFunctionInit ? "(OK) [" + model_->functionHandler().getFunctionStrView() + "]\n" : "\n")
-           << "2. Set Algorithm " << (isAlgorithmInit ? "(OK) ["  + model_->algorithmStrView() + "]\n" : "\n")
-           << "3. Set Stopping criterion " << (isStoppingCriteriaInit ? "(OK) ["  + model_->stoppingCriterionStrView() + "]\n" : "\n")
-           << "4. Set Function domain " << (isFunctionDomainInit ? "(OK) \n"  : "\n")
-           << "5. Set Magnitude " << (isMagnitudeInit ? "(OK) ["  +  std::to_string(model_->magnitude())+ "]\n" : "\n")
-           << "6. Set Start Point " << (isStartPointInit ? "(OK) \n" : "\n")
-           << "7. Set Iteration count " << (isIterationCountInit ? "(OK) ["  +  std::to_string(model_->iterCount())+  "]\n" : "\n")
-           << "8. Set Step size " <<  (isStepSizeInit ? "(OK) [" + std::to_string(model_->alpha()) + "]\n" : "\n")
-           << "9. Run model  \n"
-           << "0. Quit \n";
-        std::cout << ss.str();
+        std::cout << GenerateHelp();
         commandNumber = InputIntNumber({"Enter your choice (option number): "},{"Enter your choice as a whole number: "});
         RequestType requestType;
         if (CheckRequestType(commandNumber)) {
@@ -122,6 +126,7 @@ bool ConsoleWrapper::CheckAlgorithmType(int commandNumber) const {
 }
 
 
+
 int ConsoleWrapper::SetStoppingCriteria() {
     std::string hint {};
     std::string errorHint = "Enter a whole number:\n";
@@ -159,7 +164,7 @@ int ConsoleWrapper::SetStoppingCriteria() {
 }
 
 int ConsoleWrapper::SetAlgorithm() {
-    std::cout << "Choose algorithm:\n 1. Gradient Descent \n 2. Random Search \n";
+    std::cout << "Choose algorithm_:\n 1. Gradient Descent \n 2. Random Search \n";
     int commandNumber = InputIntNumber({});
     Algorithm algorithm;
     if (CheckAlgorithmType(commandNumber)) {
@@ -193,6 +198,7 @@ int ConsoleWrapper::SetStartPoint() {
     double coordinate = 0;
     Point startPoint = {};
     std::string line;
+    std::cin.clear();
     getline(std::cin, line);
     std::istringstream iss(line);
     while (iss >> coordinate && startPoint.size() < model_->functionHandler().getDim())
@@ -214,6 +220,7 @@ int ConsoleWrapper::SetMagnitude() {
 }
 
 int ConsoleWrapper::SetFunctionDomain() {
+    
     isFunctionDomainInit = true;
     return 0;
 }
@@ -233,7 +240,7 @@ int ConsoleWrapper::SetIterationCount() {
 }
 
 int ConsoleWrapper::SetStepSize() {
-    double alpha= InputIntNumber("Enter step size","Enter the number: ");
+    double alpha= InputDoubleNumber("Enter step size","Enter the number: ");
     model_->setAlpha(alpha);
     isStepSizeInit = true;
     return 0;
@@ -275,6 +282,7 @@ double ConsoleWrapper::InputDoubleNumber(const std::string &hint, const std::str
     }
     return number;
 }
+
 
 
 
