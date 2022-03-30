@@ -258,7 +258,7 @@ bool GradientDescent::inDomain()
 {
     std::vector<Domain> domain =  functionHandler_.getFunctionDomain();
     for (auto i = 0; i < domain.size(); ++i) {
-        if ( abs(currentPoint_.at(i)) > abs(domain.at(i).first) || abs(currentPoint_.at(i)) > abs(domain.at(i).second)) {
+        if ( std::abs(currentPoint_.at(i)) > std::abs(domain.at(i).first) || std::abs(currentPoint_.at(i)) > std::abs(domain.at(i).second)) {
             return false;
         }
     }

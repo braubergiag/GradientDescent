@@ -17,22 +17,20 @@ int ConsoleWrapper::SetFunction() {
         }
     }
     std::cout << std::endl;
-    isFunctionInit = true;
     return 0;
 }
 std::string ConsoleWrapper::GenerateHelp() const {
     std::stringstream ss;
-//    const int precision = 15;
-//    ss.precision(precision);
-    ss << "1. Set Function " << (isFunctionInit ? "(OK) [" + model_->functionHandler().getFunctionStrView() + "]\n" : "\n")
-       << "2. Set Algorithm " << (isAlgorithmInit ? "(OK) ["  + model_->algorithmStrView() + "]\n" : "\n")
-       << "3. Set Stopping criterion " << (isStoppingCriteriaInit ? "(OK) ["  + model_->stoppingCriterionStrView() + "]\n" : "\n")
-       << "4. Set Function domain " << (isFunctionDomainInit ? "(OK) " + GetDomainView() + "\n"  : "\n")
-       << "5. Set Magnitude "  <<  (isMagnitudeInit ? "(OK) \n" : "\n")
-       << "6. Set Start Point " << (isStartPointInit ? "(OK) " + GetStartPointView() + "\n" : "\n")
-       << "7. Set Iteration count " << (isIterationCountInit ? "(OK) ["  +  std::to_string(model_->iterCount())+  "]\n" : "\n")
-       << "8. Set Step size " <<  (isStepSizeInit ? "(OK) [" + std::to_string(model_->alpha()) + "]\n" : "\n")
-       << "9. Set number of trials (in random search) " << (isNumberOfTrialsInit ? "(OK) [" + std::to_string(model_->numberOfTrials()) + "]\n" : "\n")
+
+    ss << "1. Set Function (OK) [" + model_->functionHandler().getFunctionStrView() + "]\n"
+       << "2. Set Algorithm (OK) ["  + model_->algorithmStrView() + "]\n"
+       << "3. Set Stopping criterion (OK) ["  + model_->stoppingCriterionStrView() + "]\n"
+       << "4. Set Function domain (OK) " + GetDomainView() + "\n"
+       << "5. Set Magnitude (OK) \n"
+       << "6. Set Start Point (OK) " + GetStartPointView() + "\n"
+       << "7. Set Iteration count (OK) ["  +  std::to_string(model_->iterCount())+  "]\n"
+       << "8. Set Step size (OK) [" + std::to_string(model_->alpha()) + "]\n"
+       << "9. Set number of trials (in random search) (OK) [" + std::to_string(model_->numberOfTrials()) + "]\n"
        << "10. Run model  \n"
        << "0. Quit \n";
     return ss.str();
@@ -110,33 +108,6 @@ void ConsoleWrapper::Run() {
     }
 }
 void ConsoleWrapper::RunModel() {
-//    std::vector<bool> initStatesGD = {isFunctionInit,isFunctionDomainInit,isStoppingCriteriaInit,isMagnitudeInit,
-//                                    isAlgorithmInit,isStartPointInit,isIterationCountInit};
-//    std::vector<bool> initStatesRS= {isFunctionInit,isFunctionDomainInit,
-//                                      isAlgorithmInit,isIterationCountInit};
-//    if (isAlgorithmInit) {
-//        switch (model_->algorimth()) {
-//            case  Algorithm::GRADIENT_DESCENT:
-//                for (const auto& state: initStatesGD) {
-//                    if (!state) {
-//                        std::cout << "Config for " << model_->algorithmStrView() << "algorithm is not complete. \n";
-//                        Run();
-//                    }
-//                }
-//                break;
-//            case Algorithm::RANDOM_SEARCH:
-//                for (const auto& state: initStatesRS) {
-//                    if (!state) {
-//                        std::cout << "Config for" << model_->algorithmStrView() << "algorithm is not complete.  \n";
-//                        Run();
-//                    }
-//                }
-//        }
-//
-//    } else {
-//        Run();
-//    }
-
     model_->run();
 
 }
@@ -193,7 +164,6 @@ int ConsoleWrapper::SetStoppingCriteria() {
             std::cout << "Stopping criteria doesn't set.\n";
             break;
     }
-    isStoppingCriteriaInit = true;
     std::cout << "You chosen " << model_->stoppingCriterionStrView() << std::endl;
     return  0;
 }
@@ -221,7 +191,6 @@ int ConsoleWrapper::SetAlgorithm() {
         default:
             break;
     }
-    isAlgorithmInit = true;
     std::cout << "You chosen: " << model_->algorithmStrView() + "\n";
 
 
@@ -229,8 +198,7 @@ int ConsoleWrapper::SetAlgorithm() {
 }
 
 int ConsoleWrapper::SetStartPoint() {
-    if (!isFunctionInit) { SetFunction();};
-    if (!isFunctionDomainInit) { SetFunctionDomain();};
+
     std::string input;
     Point startPoint = {};
     double coordinate;
@@ -243,7 +211,6 @@ int ConsoleWrapper::SetStartPoint() {
         SetStartPoint();
     }
     model_->setStartPoint(startPoint);
-    isStartPointInit = true;
 
     return 0;
 }
@@ -251,8 +218,7 @@ int ConsoleWrapper::SetStartPoint() {
 int ConsoleWrapper::SetMagnitude() {
 
     double magnitude = InputDoubleNumber("Magnitude: ", "No, enter magnitude as a number: ");
-    model_->setMagnitude(magnitude);
-    isMagnitudeInit = true;
+    model_->setMagnitude(magnitude);;
 
     return 0;
 }
@@ -275,28 +241,24 @@ int ConsoleWrapper::SetFunctionDomain() {
 
     }
     model_->functionHandler().setFunctionDomain(functionDomain);
-    isFunctionDomainInit = true;
     return 0;
 }
 
 int ConsoleWrapper::SetNumberOfTrials() {
     int numberOfTrials = InputIntNumber("Enter number of trials: ","Enter a whole number: ");
     model_->setNumberOfTrials(numberOfTrials);
-    isNumberOfTrialsInit = true;
     return 0;
 }
 
 int ConsoleWrapper::SetIterationCount() {
     int iterCount= InputIntNumber("Enter max number of iterations: ","Enter a whole number: ");
     model_->setIterCount(iterCount);
-    isIterationCountInit = true;
     return 0;
 }
 
 int ConsoleWrapper::SetStepSize() {
     double alpha= InputDoubleNumber("Enter step size: ","Enter the number: ");
     model_->setAlpha(alpha);
-    isStepSizeInit = true;
     return 0;
 }
 
@@ -366,7 +328,7 @@ bool ConsoleWrapper::CheckBoundsForPoint(const Point &point) const {
 
     std::vector<Domain> domain =  model_->functionHandler().getFunctionDomain();
     for (auto i = 0; i < domain.size(); ++i) {
-        if ( abs(point.at(i)) > abs(domain.at(i).first) || abs(point.at(i)) > abs(domain.at(i).second)) {
+        if ( std::abs(point.at(i)) > std::abs(domain.at(i).first) || std::abs(point.at(i)) > std::abs(domain.at(i).second)) {
             return false;
         }
     }
@@ -375,9 +337,17 @@ bool ConsoleWrapper::CheckBoundsForPoint(const Point &point) const {
     return true;
 }
 
-void ConsoleWrapper::LoadDefaultState() {
+ConsoleWrapper::ConsoleWrapper(Model *model) : model_(model) {
+    int defaultFuncNumber = 1;
+    for (const auto & [funcName,funcHandler] : model_->functionsLibrary()){
+        if (funcHandler.getFunctionNumber() == defaultFuncNumber) {
+            model_->setFunctionHandler(funcHandler);
+            model_->setStartPoint(funcHandler.getStartPoint());
+        }
+    }
 
 }
+
 
 
 

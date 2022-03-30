@@ -21,7 +21,7 @@ enum class RequestType {
 
 class ConsoleWrapper {
 public:
-    ConsoleWrapper(Model * model) : model_(model) {};
+    ConsoleWrapper(Model * model);
     void Run() ;
     void RunModel();
 
@@ -47,20 +47,9 @@ private:
     std::string GetStartPointView() const;
     std::string GetDomainView() const;
 
-    void LoadDefaultState() ;
-
-
     double InputDoubleNumber(const std::string &hint = {}, const std::string &errorHint = {}) const;
     int InputIntNumber(const std::string &hint = {}, const std::string &errorHint = {}) const;
-    bool isFunctionDomainInit {true};
-    bool isStoppingCriteriaInit {true};
-    bool isFunctionInit {false};
-    bool isAlgorithmInit{true};
-    bool isStartPointInit{true};
-    bool isIterationCountInit{true};
-    bool isStepSizeInit{true};
-    bool isMagnitudeInit{true};
-    bool isNumberOfTrialsInit{true};
+
     Model * model_;
 };
 
