@@ -5,7 +5,7 @@
 #include "model.h"
 #include <iomanip>
 enum class RequestType {
-    STOP = 0,
+    RUN_MODEL = 0,
     SET_FUNCTION = 1,
     SET_ALGORITHM = 2,
     SET_STOPPING_CRITERIA = 3,
@@ -15,7 +15,7 @@ enum class RequestType {
     SET_ITERATION_COUNT = 7,
     SET_STEP_SIZE = 8,
     SET_NUMBER_OF_TRIALS = 9,
-    RUN_MODEL = 10,
+    STOP = 10,
     REQUEST_COUNT = 11,
 };
 

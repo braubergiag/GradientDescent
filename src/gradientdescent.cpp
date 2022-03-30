@@ -83,7 +83,7 @@ bool GradientDescent::randomSearch(std::vector<double> &funcLoc,
         singleMiddlePoint =  domain.at(i).first < 0 ? (ranges.at(i) / 2) - (ranges.at(i) / 2) : (ranges.at(i) / 2);
         middlePoint.push_back(singleMiddlePoint);
     }
-    
+
     double currentBoardLen = minRange / 2;
 
     clearState();

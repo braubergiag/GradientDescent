@@ -22,7 +22,8 @@ int ConsoleWrapper::SetFunction() {
 std::string ConsoleWrapper::GenerateHelp() const {
     std::stringstream ss;
 
-    ss << "1. Set Function (OK) [" + model_->functionHandler().getFunctionStrView() + "]\n"
+    ss << "0. Run Model \n"
+      << "1. Set Function (OK) [" + model_->functionHandler().getFunctionStrView() + "]\n"
        << "2. Set Algorithm (OK) ["  + model_->algorithmStrView() + "]\n"
        << "3. Set Stopping criterion (OK) ["  + model_->stoppingCriterionStrView() + "]\n"
        << "4. Set Function domain (OK) " + GetDomainView() + "\n"
@@ -31,14 +32,14 @@ std::string ConsoleWrapper::GenerateHelp() const {
        << "7. Set Iteration count (OK) ["  +  std::to_string(model_->iterCount())+  "]\n"
        << "8. Set Step size (OK) [" + std::to_string(model_->alpha()) + "]\n"
        << "9. Set number of trials (in random search) (OK) [" + std::to_string(model_->numberOfTrials()) + "]\n"
-       << "10. Run model  \n"
-       << "0. Quit \n";
+       << "10. Quit  \n";
+
     return ss.str();
 }
 
 void ConsoleWrapper::Run() {
 
-//    STOP = 0,
+//    STOP = 10,
 //    SET_FUNCTION = 1,
 //    SET_ALGORITHM = 2,
 //    SET_STOPPING_CRITERIA = 3,
@@ -48,7 +49,7 @@ void ConsoleWrapper::Run() {
 //    SET_ITERATION_COUNT = 7,
 //    SET_STEP_SIZE = 8,
 //    SET_NUMBER_OF_TRIALS = 9,
-//    RUN_MODEL = 10,
+//    RUN_MODEL = 0,
 //    REQUEST_COUNT = 11,
     bool running = true;
 
