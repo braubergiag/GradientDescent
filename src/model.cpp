@@ -202,6 +202,11 @@ void Model::setFunctionsLibrary()
         fh_6.setStartPoint({0,0});
         functionsLibrary_[f6View] = fh_6;
     }
+    int functionNumber = 0;
+    for ( auto & [funcName,funcHandler] : functionsLibrary_){
+        funcHandler.setFunctionNumber(++functionNumber);
+
+    }
 }
 
 void Model::printResult()

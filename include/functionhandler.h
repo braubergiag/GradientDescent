@@ -36,7 +36,7 @@ public:
     void setDim(int newDim);
     void setFunctionDomain(const std::vector<Domain> &newFunctionDomain);
     void setStartPoint(Point newStartPoint);
-
+    void setFunctionNumber(int functionNumber);
 
 
 private:
@@ -48,6 +48,9 @@ private:
     int dim_ = 0;
     std::string functionStrView_;
     int functionNumber_;
+
+
+private:
     static int functionCounter_;
 
 

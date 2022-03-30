@@ -10,8 +10,7 @@ FunctionHandler::FunctionHandler()
 
 FunctionHandler::FunctionHandler( Function objectFunction,
                                   std::vector<Function> gradFunction,int dim, std::string  functionStrView):
-    objectFunction_(objectFunction),gradFunction_(gradFunction),dim_(dim),functionStrView_(functionStrView),
-    functionNumber_(++functionCounter_){
+    objectFunction_(objectFunction),gradFunction_(gradFunction),dim_(dim),functionStrView_(functionStrView){
 
 //    std::cout << "Create fh #" << functionNumber_ << std::endl;
 }
@@ -79,4 +78,8 @@ Point FunctionHandler::getStartPoint() const
 void FunctionHandler::setStartPoint(Point newStartPoint)
 {
     startPoint_ = newStartPoint;
+}
+
+void FunctionHandler::setFunctionNumber(int functionNumber) {
+    functionNumber_ = functionNumber;
 }
