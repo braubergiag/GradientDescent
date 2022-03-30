@@ -34,11 +34,11 @@ double Model::alpha() const
 std::string Model::stoppingCriterionStrView() const
 {
     switch (stoppingCriterion_) {
-        case StoppingCriterion::byDeltaChangeMagnitude:
+        case StoppingCriterion::BY_DELTA_CHANGE_MAGNITUDE:
             return "Difference beetween points";
-        case StoppingCriterion::byValueChangeMagnitude:
+        case StoppingCriterion::BY_VALUE_CHANGE_MAGNITUDE:
             return "Difference beetween function values";
-        case StoppingCriterion::byGradientMagnitude:
+        case StoppingCriterion::BY_GRADIENT_MAGNITUDE:
             return "Gradient Magnitude";
         default:
             perror("(StrView) Stopping criteria does not set.");
@@ -50,9 +50,9 @@ std::string Model::stoppingCriterionStrView() const
 std::string Model::algorithmStrView() const
 {
     switch (algorimth_) {
-        case Algorithm::gradientDescent:
+        case Algorithm::GRADIENT_DESCENT:
             return "Gradien Descent";
-        case Algorithm::randomSearch:
+        case Algorithm::RANDOM_SEARCH:
             return "Random Search";
         default:
             perror("(StrView) Algorithm criteria does not set.");
@@ -91,9 +91,9 @@ void Model::run()
     gd_.Init(startPoint_,alpha_,
              iterCount_,magnitudeThreshHold_);
     gd_.setStoppingCriterion(this->stoppingCriterion_);
-    if (algorimth_ == Algorithm::gradientDescent) {
+    if (algorimth_ == Algorithm::GRADIENT_DESCENT) {
         gd_.Optimize(functionLocation_,functionValue_);
-    } else if (algorimth_ == Algorithm::randomSearch) {
+    } else if (algorimth_ == Algorithm::RANDOM_SEARCH) {
         gd_.setNumberOfTrials(numberOfTrials_);
         gd_.randomSearch(functionLocation_,functionValue_,functionHandler_);
     }
@@ -238,10 +238,10 @@ std::string Model::generateLog()
     result += "Function value: " + std::to_string(functionValue_) + "\t|";
 
     result += "\n";
-    if (algorimth_ == Algorithm::gradientDescent) {
+    if (algorimth_ == Algorithm::GRADIENT_DESCENT) {
         result += "|Stopping Criteria: " + stoppingCriterionStrView() + "\t";
         result += "|Step size: " + std::to_string(alpha_) + "|\t";
-    } else if (algorimth_ == Algorithm::randomSearch){
+    } else if (algorimth_ == Algorithm::RANDOM_SEARCH){
         result += "|Method: " + algorithmStrView() + " Num of trials per frame: " + std::to_string(numberOfTrials_);
     }
 

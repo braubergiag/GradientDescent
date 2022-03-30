@@ -16,9 +16,12 @@ using Function = std::function<double(const std::vector<double> &)>;
 using Point = std::vector<double>;
 
 enum class StoppingCriterion {
-    byGradientMagnitude,
-    byDeltaChangeMagnitude,
-    byValueChangeMagnitude
+    BY_GRADIENT_MAGNITUDE = 1,
+    BY_DELTA_CHANGE_MAGNITUDE = 2,
+    BY_VALUE_CHANGE_MAGNITUDE = 3,
+
+
+    STOPPING_CRITERION_COUNT = 3,
 };
 
 

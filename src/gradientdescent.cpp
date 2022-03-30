@@ -194,13 +194,13 @@ void GradientDescent::InitStoppingCriterion()
 
 
     switch (stoppingCriterion_) {
-        case StoppingCriterion::byDeltaChangeMagnitude:
+        case StoppingCriterion::BY_DELTA_CHANGE_MAGNITUDE:
             evalMagnitude = &GradientDescent::ComputeDeltaChangeMagnitude;
             break;
-        case StoppingCriterion::byValueChangeMagnitude:
+        case StoppingCriterion::BY_VALUE_CHANGE_MAGNITUDE:
             evalMagnitude =&GradientDescent::ComputeValueChangeMagnitude;
             break;
-        case StoppingCriterion::byGradientMagnitude:
+        case StoppingCriterion::BY_GRADIENT_MAGNITUDE:
             evalMagnitude = &GradientDescent::ComputeGradientMagnitude;
             break;
         default:

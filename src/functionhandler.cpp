@@ -13,7 +13,7 @@ FunctionHandler::FunctionHandler( Function objectFunction,
     objectFunction_(objectFunction),gradFunction_(gradFunction),dim_(dim),functionStrView_(functionStrView),
     functionNumber_(++functionCounter_){
 
-    std::cout << "Create fh #" << functionNumber_ << std::endl;
+//    std::cout << "Create fh #" << functionNumber_ << std::endl;
 }
 
 int FunctionHandler::getFunctionNumber() const {

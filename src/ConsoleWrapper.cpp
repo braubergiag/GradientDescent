@@ -1,17 +1,15 @@
-//
-// Created by marshall on 30.03.2022.
-//
+
 
 #include "ConsoleWrapper.h"
 
-int ConsoleWrapper::ChooseFunction() {
+int ConsoleWrapper::SetFunction() {
     std::cout << "Выберите функцию для оптимизации:\n";
     for (const auto & [funcName,funcHandler] : model_->functionsLibrary()){
         std::cout << funcHandler.getFunctionNumber() << ". " << funcName << "\n";
 
     }
     std::string help = "Введите целое число от 1 до " + std::to_string(model_->functionsLibrary().size()) + ": ";
-    int commandNumber = InputCommand(help);
+    int commandNumber = InputIntNumber(help, {});
     for (const auto & [funcName,funcHandler] : model_->functionsLibrary()){
         if (funcHandler.getFunctionNumber() == commandNumber) {
             std::cout << "Вы выбрали: " << funcName;
@@ -29,22 +27,37 @@ void ConsoleWrapper::Run() {
     int commandNumber = 0;
     while (running){
 
-        commandNumber = InputCommand();
+        commandNumber = InputIntNumber({});
         RequestType requestType;
         if (CheckRequestType(commandNumber)) {
             requestType = static_cast<RequestType>(commandNumber);
+        } else {
+            std::cout << "Incorrect command \n";
+            continue;
         }
 
 
         switch (requestType) {
-            case RequestType::CHOOSE_FUNCTION:
-                ChooseFunction();
+            case RequestType::SET_FUNCTION:
+                SetFunction();
                 break;
-            case RequestType::CHOOSE_ALGORITHM:
-                ChooseAlgorithm();
+            case RequestType::SET_ALGORITHM:
+                SetAlgorithm();
                 break;
-            case RequestType::CHOOSE_STOPPING_CRITERIA:
-                ChooseStoppingCriteria();
+            case RequestType::SET_STOPPING_CRITERIA:
+                SetStoppingCriteria();
+                break;
+            case RequestType::SET_START_POINT:
+                SetStartPoint();
+                break;
+            case RequestType::SET_FUNCTION_DOMAIN:
+                SetFunctionDomain();
+                break;
+            case RequestType::SET_MAGNITUDE:
+                SetMagnitude();
+                break;
+            case RequestType::SET_STEP_SIZE:
+                SetStepSize();
                 break;
             case RequestType::STOP:
                 running = false;
@@ -63,77 +76,163 @@ bool ConsoleWrapper::CheckRequestType(int commandNumber) const {
     }
     return true;
 }
-
-int ConsoleWrapper::InputCommand(const std::string &hint) const {
-    std::string command;
-    bool isOk = false;
-    int commandNumber;
-
-    std::cout << "Введите номер команды: ";
-    std::cin >> command;
-    while (!isOk){
-        try {
-            commandNumber = std::stoi(command);
-            isOk = true;
-        } catch (std::invalid_argument const& ex) {
-            std::cout << "std::invalid_argument::what(): " << ex.what() << '\n';
-            std::cout << "Введите номер команды: ";
-            std::cin >> command;
-        }
+bool ConsoleWrapper::CheckStoppingCriterionType(int commandNumber) const {
+    if (commandNumber < 0 || commandNumber > static_cast<int>(StoppingCriterion::STOPPING_CRITERION_COUNT)) {
+        return false;
     }
-
-    return commandNumber;
+    return true;
+}
+bool ConsoleWrapper::CheckAlgorithmType(int commandNumber) const {
+    if (commandNumber < 0 || commandNumber > static_cast<int>(Algorithm::ALGORITHM_COUNT)) {
+        return false;
+    }
+    return true;
 }
 
-int ConsoleWrapper::ChooseStoppingCriteria() {
-    std::cout << "Выберите критерий остановки:"
-                 "\n 1. По значению градиента "
-                 "\n 2. По значению разности между точками"
-                 "\n 3. По значению разности функции";
-    std::cout << "Ваш выбор: ";
-    std::string choice;
-    std::cin >> choice;
-    int stoppingCriteriaChoice = std::stoi(choice);
-    switch (stoppingCriteriaChoice) {
-        case 1:
-            model_->setStoppingCriterion(StoppingCriterion::byGradientMagnitude);
+
+int ConsoleWrapper::SetStoppingCriteria() {
+    std::string hint {};
+    std::string errorHint = "Enter a whole number:\n";
+    std::stringstream ss;
+    ss << "Choose stopping criteria:" <<
+                 "\n 1. By Gradient Magnitude " <<
+                 "\n 2. By Difference between points" <<
+                 "\n 3. By Difference between function values\n Your choice: ";
+    ss >> hint;
+    int commandNumber = InputIntNumber(hint,errorHint);
+    StoppingCriterion stoppingCriterion;
+    if (CheckStoppingCriterionType(commandNumber)) {
+        stoppingCriterion = static_cast<StoppingCriterion>(commandNumber);
+    } else {
+        std::cout << "Stopping criterion didn't set\n";
+        return 1;
+    }
+    switch (stoppingCriterion) {
+        case StoppingCriterion::BY_GRADIENT_MAGNITUDE:
+            model_->setStoppingCriterion(StoppingCriterion::BY_GRADIENT_MAGNITUDE);
             break;
-        case 2:
-            model_->setStoppingCriterion(StoppingCriterion::byDeltaChangeMagnitude);
+        case StoppingCriterion::BY_DELTA_CHANGE_MAGNITUDE:
+            model_->setStoppingCriterion(StoppingCriterion::BY_DELTA_CHANGE_MAGNITUDE);
             break;
-        case 3:
-            model_->setStoppingCriterion(StoppingCriterion::byValueChangeMagnitude);
+        case StoppingCriterion::BY_VALUE_CHANGE_MAGNITUDE:
+            model_->setStoppingCriterion(StoppingCriterion::BY_VALUE_CHANGE_MAGNITUDE);
             break;
         default:
-            std::cout << "Критерий остановки не выбран.\n";
+            std::cout << "Stopping criteria doesn't set.\n";
             break;
     }
 
-    std::cout << "Вы выбрали " << model_->stoppingCriterionStrView() << std::endl;
+    std::cout << "You chosen " << model_->stoppingCriterionStrView() << std::endl;
     return  0;
 }
 
-int ConsoleWrapper::ChooseAlgorithm() {
-    std::cout << "Выберите алгоритм оптимизации:\n 1. Градиентный спуск \n 2. Случайный поиск \n";
-    bool isSuccess = true;
-    int commandNumber = InputCommand();
-    switch (commandNumber) {
-        case 1:
-            model_->setAlgorimth(Algorithm::gradientDescent);
+int ConsoleWrapper::SetAlgorithm() {
+    std::cout << "Choose algorithm:\n 1. Gradient Descent \n 2. RandomSearch \n";
+    int commandNumber = InputIntNumber({});
+    Algorithm algorithm;
+    if (CheckAlgorithmType(commandNumber)) {
+        algorithm = static_cast<Algorithm>(commandNumber);
+    } else {
+        std::cout << "Algorithm didn't set\n";
+        return 1;
+    }
+
+    switch (algorithm) {
+        case Algorithm::GRADIENT_DESCENT:
+            model_->setAlgorimth(Algorithm::GRADIENT_DESCENT);
             break;
-        case 2:
-            model_->setAlgorimth(Algorithm::randomSearch);
+        case Algorithm::RANDOM_SEARCH:
+            model_->setAlgorimth(Algorithm::RANDOM_SEARCH);
             break;
         default:
-            isSuccess = false;
-
             break;
     }
-    if (isSuccess) {
-        std::cout << "Вы выбрали " << model_->algorithmStrView() + "\n";
-    } else {
-        std::cout << "Алгоритм не выбран.\n";
-    }
+    std::cout << "You chosen " << model_->algorithmStrView() + "\n";
+
 
     return 0;
 }
+
+int ConsoleWrapper::SetStartPoint() {
+    if (!isFunctionInit) { SetFunction();};
+    if (!isFunctionDomainInit) { SetFunctionDomain();};
+    std::cout << "Enter start point coordinates separated by spaces: ";
+    double coordinate = 0;
+    Point startPoint = {};
+    std::string line;
+    getline(std::cin, line);
+    std::istringstream iss(line);
+    while (iss >> coordinate && startPoint.size() < model_->functionHandler().getDim())
+    {
+        startPoint.push_back(coordinate);
+    }
+    isStartPointInit = true;
+
+    return 0;
+}
+
+int ConsoleWrapper::SetMagnitude() {
+
+    double magnitude = InputDoubleNumber("Magnitude: ", "No, enter magnitude as a number: ");
+    model_->setMagnitude(magnitude);
+
+
+    return 0;
+}
+
+int ConsoleWrapper::SetFunctionDomain() {
+    return 0;
+}
+
+int ConsoleWrapper::SetNumberOfTrials() {
+    int numberOfTrials = InputIntNumber("Enter number of trials:","Enter a whole number");
+    model_->setNumberOfTrials(numberOfTrials);
+    return 0;
+}
+
+int ConsoleWrapper::SetIterationCount() {
+    return 0;
+}
+
+int ConsoleWrapper::SetStepSize() {
+    return 0;
+}
+
+
+
+int ConsoleWrapper::InputIntNumber(const std::string &hint, const std::string &errorHint) const {
+    std::string input;
+    bool isOk = false;
+    int number;
+    std::cout << hint;
+    std::cin >> input;
+    while (!isOk){
+        try {
+            number = std::stoi(input);
+            isOk = true;
+        } catch (std::invalid_argument const& ex) {
+            std::cout << errorHint;
+            std::cin >> input;
+        }
+    }
+    return number;
+}
+double ConsoleWrapper::InputDoubleNumber(const std::string &hint, const std::string &errorHint) const {
+    std::string input;
+    bool isOk = false;
+    double number;
+    std::cout << hint;
+    std::cin >> input;
+    while (!isOk){
+        try {
+            number = std::stod(input);
+            isOk = true;
+        } catch (std::invalid_argument const& ex) {
+            std::cout << errorHint;
+            std::cin >> input;
+        }
+    }
+    return number;
+}
+
+

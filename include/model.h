@@ -8,8 +8,10 @@
 #include <sstream>
 
 enum class Algorithm {
-    gradientDescent,
-    randomSearch
+    GRADIENT_DESCENT = 1,
+    RANDOM_SEARCH = 2,
+
+    ALGORITHM_COUNT = 2
 
 };
 
