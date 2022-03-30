@@ -43,7 +43,7 @@ public:
     void setStoppingCriterion(StoppingCriterion newStoppingCriterion);
     void setMagnitude(double newMagnitude);
     void setMagnitudeENotation(const std::string &newMagnitudeENotation);
-
+    void setFunctionsLibrary();
     void setIsInitialized(bool newIsInitialized);
 
 
@@ -62,6 +62,8 @@ public:
    Algorithm algorimth() const;
    void setAlgorimth(Algorithm newAlgorimth);
 
+   Point startPoint() const;
+
 private:
     GradientDescent gd_;
     FunctionHandler  functionHandler_;
@@ -73,7 +75,7 @@ private:
     Point functionLocation_;
     FunctionsLibrary functionsLibrary_;
 
-    void setFunctionsLibrary();
+
     uint numberOfTrials_;
     double functionValue_ {0};
     double magnitude_ {0};

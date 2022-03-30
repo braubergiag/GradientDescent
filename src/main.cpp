@@ -197,6 +197,8 @@ int ChooseFunction(Model * model) {
 
         }
     }
+    std::cout << std::endl;
+    std::cin.clear();
 }
 int main(int argc, char *argv[])
 {
@@ -204,12 +206,7 @@ int main(int argc, char *argv[])
     Model * model = new Model();
 
 
-
-    ChooseStoppingCriteria(model);
-    ChooseAlgorithm(model);
-
-
-
+    std::string command_line;
     while (getline(std::cin,command_line)) {
         std::stringstream ss(command_line);
         std::string command;
@@ -220,10 +217,16 @@ int main(int argc, char *argv[])
                 ChooseFunction(model);
                 break;
             case 2:
+                ChooseAlgorithm(model);
+                break;
+            case 3:
+                ChooseStoppingCriteria(model);
+                break;
+            default:
+                break;
+
 
         }
-
-
     }
 
     delete model;

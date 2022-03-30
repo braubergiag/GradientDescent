@@ -33,14 +33,24 @@ public:
 
     // Setters
     void setStoppingCriterion(StoppingCriterion newStoppingCriterion);
+    void setNumberOfTrials(uint newNumberOfTrials);
 
     // Getters
     const std::vector<Point> &history() const;
     const std::vector<std::vector<double> > &historyByCoord() const;
     const std::vector<double> &functionValuesHistory() const;
-
     uint numberOfTrials() const;
-    void setNumberOfTrials(uint newNumberOfTrials);
+
+    void clearState();
+    void prepareState();
+    bool inDomain();
+
+    const FunctionHandler &fh() const;
+
+    void setFh(const FunctionHandler &newFh);
+
+    const FunctionHandler &functionHandler() const;
+    void setFunctionHandler(const FunctionHandler &newFunctionHandler);
 
 private:
 
@@ -77,6 +87,7 @@ private:
     std::vector<double> gradientVector_;
     Function objectFunc_;
     std::vector<Function> gradFunc_;
+    FunctionHandler functionHandler_;
 
 };
 

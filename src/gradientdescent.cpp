@@ -1,6 +1,8 @@
 #include "gradientdescent.h"
 
 
+
+
 GradientDescent::GradientDescent() {
 
     nDims_ = 0;
@@ -28,31 +30,30 @@ bool GradientDescent::Optimize(std::vector<double> & funcLoc, double & funcVal) 
     int iterCount = 0;
     stoppingMagnitude_ = 1;
 
-    history_.clear();
-    history_.push_back(startPoint_);
-    historyByCoord_.clear();
-    functionValuesHistory_.clear();
-    for (auto i = 0; i < nDims_; ++i) {
-        historyByCoord_.push_back(std::vector<double>{});
-        historyByCoord_[i].push_back(startPoint_[i]);
-    }
+
+
+
+    clearState();
+    prepareState();
 
     InitStoppingCriterion();
-    while ((iterCount < maxIter_) && (stoppingMagnitude_ > eps_)) {
+    PrintIterationLog(iterCount);
+    while ((iterCount < maxIter_) && (stoppingMagnitude_ > eps_) && inDomain()) {
         gradientVector_ = ComputeGradientVector();
         stoppingMagnitude_ = (this->*evalMagnitude)();
 
         std::vector<double> newPoint(nDims_,0);
         for (int i = 0; i < nDims_; ++i) {
             newPoint[i]  += currentPoint_[i] - (alpha_ * gradientVector_[i]);
-            historyByCoord_[i].push_back(newPoint[i]);
+            historyByCoord_.at(i).push_back(newPoint[i]);
+
         }
         history_.push_back(currentPoint_);
         prevPoint_ = currentPoint_;
         currentPoint_ = newPoint;
         functionValuesHistory_.push_back(objectFunc_(currentPoint_));
 
-        PrintIterationLog(iterCount);
+        PrintIterationLog(iterCount + 1);
         iterCount++;
 
 
@@ -66,27 +67,33 @@ bool GradientDescent::randomSearch(std::vector<double> &funcLoc,
                                    double &funcVal,FunctionHandler & fh)
 {
 
-    double range_x = fh.getFunctionDomain().at(0).second - fh.getFunctionDomain().at(0).first;
-    double range_y = fh.getFunctionDomain().at(1).second - fh.getFunctionDomain().at(1).first;
-    double mx = range_x / 2;
-    double my = range_y / 2;
-    double len = mx < my ? mx : my;
-    int iterCount = 0;
+    double xMin,xMax,yMin,yMax;
+     std::vector<Domain> domain =  functionHandler_.getFunctionDomain();
+    xMin = domain.at(0).first;
+    xMax = domain.at(0).second;
+
+    yMin = domain.at(1).first;
+    yMax=  domain.at(1).second;
+
+
+
+    double range_x = xMax - xMin;
+    double range_y = yMax - yMin;
+    double mx = xMin < 0 ? (range_x / 2) - (range_x / 2) : (range_x / 2);
+    double my = yMin < 0 ? (range_y / 2) - (range_y / 2) : (range_y / 2);
+
+    double len = range_x < range_y ? range_x / 2 : range_y / 2;
     double lx,ly,rx,ry,x,y;
 
 
-    history_.clear();
-    history_.push_back(startPoint_);
-    historyByCoord_.clear();
-    functionValuesHistory_.clear();
-    for (auto i = 0; i < nDims_; ++i) {
-        historyByCoord_.push_back(std::vector<double>{});
-        historyByCoord_[i].push_back(startPoint_[i]);
-    }
+    clearState();
+    prepareState();
+    int iterCount = 0;
     unsigned m_seed  = std::chrono::system_clock::now().time_since_epoch().count();
     std::mt19937 generator;
     std::uniform_real_distribution<double> uniform_x,uniform_y;
     generator.seed(m_seed);
+    PrintIterationLog(iterCount);
 
     while (iterCount < maxIter_ && len > eps_) {
         lx = mx - len;
@@ -111,7 +118,7 @@ bool GradientDescent::randomSearch(std::vector<double> &funcLoc,
 
             }
         }
-        PrintIterationLog(iterCount);
+        PrintIterationLog(iterCount + 1);
         iterCount++;
         len *= 0.9;
     }
@@ -213,9 +220,57 @@ void GradientDescent::PrintIterationLog(int iter)
     std::cout << std::endl;
 }
 
+const FunctionHandler &GradientDescent::functionHandler() const
+{
+    return functionHandler_;
+}
+
+void GradientDescent::setFunctionHandler(const FunctionHandler &newFunctionHandler)
+{
+    functionHandler_ = newFunctionHandler;
+}
+
+
+
 uint GradientDescent::numberOfTrials() const
 {
     return numberOfTrials_;
+}
+
+void GradientDescent::clearState()
+{
+    history_.clear();
+    historyByCoord_.clear();
+    functionValuesHistory_.clear();
+}
+
+void GradientDescent::prepareState()
+{
+    history_.push_back(startPoint_);
+    currentPoint_ = startPoint_;
+    for (auto i = 0; i < nDims_; ++i) {
+        historyByCoord_.push_back(std::vector<double>{});
+        historyByCoord_[i].push_back(startPoint_[i]);
+    }
+}
+
+bool GradientDescent::inDomain()
+{
+    double xMin,xMax,yMin,yMax;
+     std::vector<Domain> domain =  functionHandler_.getFunctionDomain();
+    xMin = domain.at(0).first;
+    xMax = domain.at(0).second;
+
+    yMin = domain.at(1).first;
+    yMax=  domain.at(1).second;
+
+
+    double x = currentPoint_.at(0);
+    double y = currentPoint_.at(1);
+    if (abs(x) >= abs(xMin) || abs(x) >= abs(xMax) || abs(y) >= abs(yMin) || abs(y) >= abs(yMax)) {
+        return false;
+    }
+    return true;
 }
 
 void GradientDescent::setNumberOfTrials(uint newNumberOfTrials)

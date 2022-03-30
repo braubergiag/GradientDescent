@@ -35,9 +35,9 @@ std::string Model::stoppingCriterionStrView() const
 {
     switch (stoppingCriterion_) {
         case StoppingCriterion::byDeltaChangeMagnitude:
-            return "Difference beetween function values";
-        case StoppingCriterion::byValueChangeMagnitude:
             return "Difference beetween points";
+        case StoppingCriterion::byValueChangeMagnitude:
+            return "Difference beetween function values";
         case StoppingCriterion::byGradientMagnitude:
             return "Gradient Magnitude";
         default:
@@ -87,6 +87,7 @@ void Model::setIterCount(int newIterCount)
 void Model::run()
 {
     gd_.InitFunctions(functionHandler_.getObjectFunction(),functionHandler_.getGradFunction());
+    gd_.setFunctionHandler(functionHandler_);
     gd_.Init(startPoint_,alpha_,
              iterCount_,magnitudeThreshHold_);
     gd_.setStoppingCriterion(this->stoppingCriterion_);
@@ -119,6 +120,11 @@ Algorithm Model::algorimth() const
 void Model::setAlgorimth(Algorithm newAlgorimth)
 {
     algorimth_ = newAlgorimth;
+}
+
+Point Model::startPoint() const
+{
+    return startPoint_;
 }
 void Model::setFunctionsLibrary()
 {
